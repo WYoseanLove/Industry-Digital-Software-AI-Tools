@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Industry-Digital-Software-AI-Tools Architecture</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #060b1a; font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; color: #e6eeff; }
+  #root { width: 1600px; padding: 36px 44px 28px; position: relative; overflow: hidden;
+    background:
+      radial-gradient(900px 420px at 12% 0%, rgba(0,200,255,.22), transparent 70%),
+      radial-gradient(900px 480px at 92% 18%, rgba(160,90,255,.22), transparent 70%),
+      radial-gradient(1000px 500px at 50% 100%, rgba(0,255,170,.14), transparent 70%),
+      linear-gradient(rgba(120,170,255,.06) 1px, transparent 1px) 0 0 / 40px 40px,
+      linear-gradient(90deg, rgba(120,170,255,.06) 1px, transparent 1px) 0 0 / 40px 40px,
+      #060b1a; }
+  h1 { margin: 0; text-align: center; font-size: 46px; font-weight: 800; letter-spacing: 1px;
+    background: linear-gradient(90deg, #4de1ff, #8d7bff 50%, #ff7be0); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 14px rgba(110,140,255,.55)); }
+  .sub { text-align: center; font-size: 17px; color: #9db4d8; margin: 10px 0 26px; letter-spacing: .3px; }
+  .layer { --c: #5bc8ff; border-radius: 16px; padding: 14px 20px 16px; margin-bottom: 6px; position: relative;
+    border: 1.5px solid color-mix(in srgb, var(--c) 70%, transparent);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--c) 20%, #0b1228), color-mix(in srgb, var(--c) 5%, #0b1228) 70%);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--c) 35%, transparent), inset 0 0 28px color-mix(in srgb, var(--c) 10%, transparent); }
+  .layer:before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 5px; border-radius: 0 5px 5px 0;
+    background: var(--c); box-shadow: 0 0 14px var(--c); }
+  .layer > .title { font-weight: 700; font-size: 18px; margin-bottom: 10px; color: var(--c); text-shadow: 0 0 10px color-mix(in srgb, var(--c) 60%, transparent); }
+  .row { display: flex; gap: 14px; }
+  .box { flex: 1; border-radius: 10px; padding: 10px 12px; font-size: 14px; line-height: 1.4; text-align: center;
+    background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+    border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); border-top: 2px solid var(--c);
+    box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+  .box b { display: block; font-size: 15px; margin-bottom: 3px; color: #ffffff; }
+  .box .zh { color: #b3c6e6; }
+  .box code, .layer > .title code { font-family: Consolas, monospace; font-size: 12.5px; color: #ffd27a; background: rgba(255,200,100,.1); padding: 1px 5px; border-radius: 4px; }
+  .arrow { text-align: center; font-size: 14px; color: #b9d4ff; height: 30px; line-height: 30px; font-weight: 600; letter-spacing: .3px; }
+  .arrow:before { content: "\25BC  "; color: #4de1ff; text-shadow: 0 0 10px #4de1ff; }
+  .arrow:after { content: "  \25BC"; color: #4de1ff; text-shadow: 0 0 10px #4de1ff; }
+
+  .l-user  { --c: #4db8ff; }
+  .l-agent { --c: #a98bff; }
+  .l-gov   { --c: #ffb347; }
+  .l-doc   { --c: #3de0a0; }
+  .l-run   { --c: #2fd8e6; }
+  .l-host  { --c: #ff6b8a; }
+  .l-app   { --c: #9fb0c8; }
+  .l-out   { --c: #b6e63c; }
+  .side { display: flex; gap: 12px; align-items: stretch; }
+  .main { flex: 1; }
+  .legend { margin-top: 14px; font-size: 13px; color: #7f98bd; text-align: center; letter-spacing: .4px; }
+</style>
+</head>
+<body>
+<div id="root">
+  <h1>Industry-Digital-Software-AI-Tools &mdash; Architecture / 仓库架构</h1>
+  <div class="sub">Natural language &rarr; AI Agent &rarr; generated skill &rarr; runner &rarr; target software &rarr; report &nbsp;|&nbsp; 自然语言 &rarr; AI Agent &rarr; 生成 skill &rarr; Runner &rarr; 目标软件 &rarr; 报告</div>
+
+  <div class="layer l-user">
+    <div class="title">1. User / 用户</div>
+    <div class="row">
+      <div class="box"><b>Natural-language request</b><span class="zh">自然语言提出需求（中文 / English / ...）</span></div>
+      <div class="box"><b>Reply in the user's language + token / cost estimate footer (G1, G2)</b><span class="zh">回复语言跟随用户，每次附 Token / 费用估算（G1、G2）</span></div>
+    </div>
+  </div>
+  <div class="arrow">request / 请求 &nbsp;&middot;&nbsp; result / 结果</div>
+
+  <div class="layer l-agent">
+    <div class="title">2. AI Agent (Copilot / Codex / Claude) &mdash; entry: <code>.github/copilot-instructions.md</code>, <code>AGENTS.md</code>, <code>CLAUDE.md</code></div>
+    <div class="row">
+      <div class="box"><b>Understand &amp; plan</b><span class="zh">理解需求并规划</span></div>
+      <div class="box"><b>Check API signatures in docs</b><span class="zh">查 API 文档核对签名</span></div>
+      <div class="box"><b>Generate skill source (C# / C++)</b><span class="zh">生成 skill 源码（C# / C++）</span></div>
+      <div class="box"><b>Build &rarr; confirm &rarr; run</b><span class="zh">编译 &rarr; 确认 &rarr; 运行</span></div>
+      <div class="box"><b>Summarise &amp; report</b><span class="zh">总结并出报告</span></div>
+    </div>
+  </div>
+  <div class="arrow">governed by / 受约束于</div>
+
+  <div class="layer l-gov">
+    <div class="title">3. Governance &amp; Memory / 规则与记忆 &mdash; <code>tools/</code>, <code>Memory/</code></div>
+    <div class="row">
+      <div class="box"><b>Global rules G1-G3</b><span class="zh">全局规则：语言 / 费用 / 双语文档</span></div>
+      <div class="box"><b>envcheck.ps1 / envdetect.ps1</b><span class="zh">环境与五款软件检测（只有 USABLE 可用）</span></div>
+      <div class="box"><b>memcheck.ps1 gate</b><span class="zh">Memory 门禁：按 scope + triggers 选出经验</span></div>
+      <div class="box"><b>Memory/ (learned.md, topics, Costomer/)</b><span class="zh">自学习：纠错 / 踩坑记录</span></div>
+      <div class="box"><b>tokencost.ps1</b><span class="zh">Token 与费用估算</span></div>
+      <div class="box"><b>Safety: never elevate, confirm before modify</b><span class="zh">安全：不提权，修改前先确认</span></div>
+    </div>
+  </div>
+  <div class="arrow">reads / 读取</div>
+
+  <div class="layer l-doc">
+    <div class="title">4. Product manuals &amp; API docs / 产品手册与 API 文档</div>
+    <div class="row">
+      <div class="box"><b>Tecnomatix</b><span class="zh">Tecnomatix_ai_skills.md<br>cookbook-md, Tecnomatix_Engineering</span></div>
+      <div class="box"><b>NX</b><span class="zh">NX_ai_skills.md<br>cookbook-md, api-md</span></div>
+      <div class="box"><b>Vismockup</b><span class="zh">Vismockup_ai_skills.md<br>api_md, vismockup_md</span></div>
+      <div class="box"><b>CATIA V5</b><span class="zh">Catia_ai_skills.md<br>api-md (objects, samples)</span></div>
+      <div class="box"><b>Office</b><span class="zh">Office_ai_skills.md</span></div>
+      <div class="box"><b>Teamcenter</b><span class="zh">reserved / 预留</span></div>
+    </div>
+  </div>
+  <div class="arrow">generates skill into <code>&lt;Product&gt;/Task/&lt;Skill&gt;/</code> / 生成 skill 到 Task 目录</div>
+
+  <div class="layer l-run">
+    <div class="title">5. Unified runners (<code>setup</code> / <code>build</code> / <code>run</code>) / 统一 Runner</div>
+    <div class="row">
+      <div class="box"><b>txai.ps1</b><span class="zh">Tecnomatix<br>C# 5 / .NET 4.8</span></div>
+      <div class="box"><b>nxrun.ps1</b><span class="zh">NX<br>C++17 (MSVC)</span></div>
+      <div class="box"><b>vmrun.ps1</b><span class="zh">Vismockup<br>C# 5 / x64</span></div>
+      <div class="box"><b>catrun.ps1</b><span class="zh">CATIA V5<br>C# 5 / x64</span></div>
+      <div class="box"><b>officerun.ps1</b><span class="zh">Office<br>C# 5 / x64</span></div>
+    </div>
+  </div>
+  <div class="arrow">load skill DLL / 加载 skill DLL</div>
+
+  <div class="layer l-host">
+    <div class="title">6. Execution hosts / 执行宿主 (built on first run into <code>%LOCALAPPDATA%\Industry-Digital-Software-AI-Tools\bin</code> / 首次运行时生成)</div>
+    <div class="row">
+      <div class="box"><b>AI Bridge add-in + named pipe</b><span class="zh">AI Bridge 插件 + 命名管道</span></div>
+      <div class="box"><b>NxRunHost.exe</b><span class="zh">NX Open 批量加载 DLL</span></div>
+      <div class="box"><b>ComRunHost.exe</b><span class="zh">COM 晚绑定（dynamic）</span></div>
+    </div>
+  </div>
+  <div class="arrow">automation API / 自动化接口</div>
+
+  <div class="layer l-app">
+    <div class="title">7. Target software / 目标软件</div>
+    <div class="row">
+      <div class="box"><b>Tecnomatix Process Simulate</b><span class="zh">Study / Robot / Weld ...</span></div>
+      <div class="box"><b>Siemens NX</b><span class="zh">NX Open C++</span></div>
+      <div class="box"><b>Vismockup (TcVis)</b><span class="zh">VFFrame.Application</span></div>
+      <div class="box"><b>CATIA V5</b><span class="zh">CATIA.Application</span></div>
+      <div class="box"><b>Excel / PowerPoint</b><span class="zh">new independent instance / 独立新实例</span></div>
+    </div>
+  </div>
+  <div class="arrow">results / 结果</div>
+
+  <div class="layer l-out">
+    <div class="title">8. Output / 产出</div>
+    <div class="row">
+      <div class="box"><b>Skill outputs in <code>Task/</code></b><span class="zh">skill 源码 / DLL / 说明（每台机器本地生成）</span></div>
+      <div class="box"><b>Excel / PowerPoint reports</b><span class="zh">Excel / PowerPoint 报告</span></div>
+      <div class="box"><b>New lessons &rarr; <code>Memory/</code></b><span class="zh">新经验回写 Memory</span></div>
+    </div>
+  </div>
+
+  <div class="legend">Docs are bilingual (English first, Chinese second) &nbsp;|&nbsp; 文档中英双语（英文在前，中文在后）</div>
+</div>
+</body>
+</html>
+
+

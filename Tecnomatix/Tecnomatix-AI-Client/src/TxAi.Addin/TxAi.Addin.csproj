@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>TxAi.Addin</AssemblyName>
+    <RootNamespace>TxAi.Addin</RootNamespace>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TxAi.Contracts\TxAi.Contracts.csproj" />
+  </ItemGroup>
+
+  <!-- Compile against the installed Process Simulate assemblies; they are already loaded in the host, so never copy them. -->
+  <ItemGroup>
+    <Reference Include="Tecnomatix.Engineering">
+      <HintPath>$(TxInstallDir)Tecnomatix.Engineering.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Tecnomatix.Engineering.Ui">
+      <HintPath>$(TxInstallDir)Tecnomatix.Engineering.Ui.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(TxInstallDir)Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "NX",
+      "includePath": [
+        "${env:UGII_BASE_DIR}/UGOPEN"
+      ],
+      "cppStandard": "c++17",
+      "intelliSenseMode": "windows-msvc-x64"
+    }
+  ],
+  "version": 4
+}
