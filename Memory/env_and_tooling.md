@@ -8,12 +8,12 @@ updated: 2026-10-29
 # Environment and tooling pitfalls / 环境与工具使用坑
 
 ## ET-11 Public repository name and private output boundaries / 公开仓库名称与私有产物边界
-- Wrong: publishing generated skills or customer memory, dropping their empty folders, or retaining the old repository name.
-- Right: use Industry-Digital-Software-AI-Tools; keep product Task and Memory/Costomer folders through .gitkeep exceptions, ignore all other contents and the generated Memory/INDEX.md, and preserve local files. Exclude Tecnomatix/Tecnomatix_Engineering, NX/api-md, Catia/api-md and both Vismockup/api-md and Vismockup/api_md from Git; document cookbook availability and authorized local API configuration rather than GitHub publishing instructions. Ignore rules do not remove previously tracked data or Git history.
+- Wrong: publishing generated skills or customer memory, dropping their empty folders, retaining the old repository name, or treating Vismockup/api-md as the API reference path.
+- Right: use Industry-Digital-Software-AI-Tools; keep product Task, Memory/Costomer, and local API reference folders through .gitkeep exceptions, ignore all other contents and the generated Memory/INDEX.md, and preserve local files. Exclude contents of Tecnomatix/Tecnomatix_Engineering, NX/api-md, Catia/api-md and Vismockup/api_md from Git; Vismockup/api_md is the correct path. Document cookbook availability and authorized local API configuration rather than GitHub publishing instructions. Ignore rules do not remove previously tracked data or Git history.
 - Trigger: GitHub, open source, rename, Task, Costomer, gitignore, 开源, 更名, 忽略。
 - Evidence: repository .gitignore, README.md, and product Task / Memory/Costomer .gitkeep files.
-- 错误：发布已生成技能或客户记忆、丢失空目录，或继续使用旧仓库名称。
-- 正确：使用 Industry-Digital-Software-AI-Tools；各产品 Task 和 Memory/Costomer 通过 .gitkeep 例外保留目录，其余内容及自动生成的 Memory/INDEX.md 均忽略，保留本地文件。Git 排除 Tecnomatix/Tecnomatix_Engineering、NX/api-md、Catia/api-md 以及 Vismockup/api-md 和 Vismockup/api_md；说明 cookbook 开放及获授权 API 的本地配置，不再保留 GitHub 发布操作说明。忽略规则不会移除已跟踪数据或 Git 历史。
+- 错误：发布已生成技能或客户记忆、丢失空目录、继续使用旧仓库名称，或误把 Vismockup/api-md 当作 API 参考目录。
+- 正确：使用 Industry-Digital-Software-AI-Tools；各产品 Task、Memory/Costomer 和本地 API 参考目录通过 .gitkeep 例外保留目录，其余内容及自动生成的 Memory/INDEX.md 均忽略，保留本地文件。Git 排除 Tecnomatix/Tecnomatix_Engineering、NX/api-md、Catia/api-md 和 Vismockup/api_md 内的其他内容；Vismockup/api_md 才是正确路径。说明 cookbook 开放及获授权 API 的本地配置，不再保留 GitHub 发布操作说明。忽略规则不会移除已跟踪数据或 Git 历史。
 - 触发：GitHub、开源、更名、Task、Costomer、gitignore、忽略。
 - 证据：仓库 .gitignore、README.md 及各产品 Task / Memory/Costomer 中的 .gitkeep 文件。
 

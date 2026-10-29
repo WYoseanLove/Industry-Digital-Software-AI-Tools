@@ -14,7 +14,5 @@ obj/
 !/NX/api-md/.gitkeep
 /Catia/api-md/*
 !/Catia/api-md/.gitkeep
-/Vismockup/api-md/*
-!/Vismockup/api-md/.gitkeep
 /Vismockup/api_md/*
 !/Vismockup/api_md/.gitkeep
