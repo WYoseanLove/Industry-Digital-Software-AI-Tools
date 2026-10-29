@@ -1,0 +1,20 @@
+bin/
+obj/
+.vs/
+/*/Task/*
+!/*/Task/.gitkeep
+/Memory/Costomer/*
+!/Memory/Costomer/.gitkeep
+/Memory/INDEX.md
+
+# Local API references (not included in the public repository)
+/Tecnomatix/Tecnomatix_Engineering/*
+!/Tecnomatix/Tecnomatix_Engineering/.gitkeep
+/NX/api-md/*
+!/NX/api-md/.gitkeep
+/Catia/api-md/*
+!/Catia/api-md/.gitkeep
+/Vismockup/api-md/*
+!/Vismockup/api-md/.gitkeep
+/Vismockup/api_md/*
+!/Vismockup/api_md/.gitkeep

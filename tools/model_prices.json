@@ -1,0 +1,233 @@
+﻿[
+    {
+        "id":  "claude-fable-5.1",
+        "name":  "Claude Fable 5.1",
+        "input":  1000,
+        "output":  5000,
+        "cache_read":  25
+    },
+    {
+        "id":  "claude-fable-5",
+        "name":  "Claude Fable 5",
+        "input":  1000,
+        "output":  5000,
+        "cache_read":  100
+    },
+    {
+        "id":  "claude-haiku-5.5",
+        "name":  "Claude Haiku 5.5",
+        "input":  10,
+        "output":  50,
+        "cache_read":  1
+    },
+    {
+        "id":  "claude-opus-4.8-fast",
+        "name":  "Claude Opus 4.8 (fast mode) (Preview)",
+        "input":  1000,
+        "output":  5000,
+        "cache_read":  100
+    },
+    {
+        "id":  "claude-opus-4.8",
+        "name":  "Claude Opus 4.8",
+        "input":  500,
+        "output":  2500,
+        "cache_read":  50
+    },
+    {
+        "id":  "claude-opus-5.5",
+        "name":  "Claude Opus 5.5",
+        "input":  400,
+        "output":  2000,
+        "cache_read":  20
+    },
+    {
+        "id":  "claude-opus-5",
+        "name":  "Claude Opus 5",
+        "input":  500,
+        "output":  2500,
+        "cache_read":  50
+    },
+    {
+        "id":  "claude-sonnet-5.5",
+        "name":  "Claude Sonnet 5.5",
+        "input":  200,
+        "output":  1000,
+        "cache_read":  10
+    },
+    {
+        "id":  "claude-sonnet-5",
+        "name":  "Claude Sonnet 5",
+        "input":  200,
+        "output":  1000,
+        "cache_read":  20
+    },
+    {
+        "id":  "gemini-3.8-flash",
+        "name":  "Gemini 3.8 Flash",
+        "input":  75,
+        "output":  375,
+        "cache_read":  7.5
+    },
+    {
+        "id":  "gemini-4-argon",
+        "name":  "Gemini 4 Argon",
+        "input":  200,
+        "output":  1000,
+        "cache_read":  10
+    },
+    {
+        "id":  "gpt-5.3-codex",
+        "name":  "GPT-5.3-Codex",
+        "input":  175,
+        "output":  1400,
+        "cache_read":  17.5
+    },
+    {
+        "id":  "gpt-5.6-luna",
+        "name":  "GPT-5.6 Luna",
+        "input":  20,
+        "output":  120,
+        "cache_read":  2
+    },
+    {
+        "id":  "gpt-5.6-sol",
+        "name":  "GPT-5.6 Sol",
+        "input":  400,
+        "output":  2000,
+        "cache_read":  40
+    },
+    {
+        "id":  "gpt-5.6-terra",
+        "name":  "GPT-5.6 Terra",
+        "input":  200,
+        "output":  1200,
+        "cache_read":  20
+    },
+    {
+        "id":  "gpt-6.1-sol",
+        "name":  "GPT-6.1 Sol",
+        "input":  200,
+        "output":  1000,
+        "cache_read":  10
+    },
+    {
+        "id":  "gpt-6-astra",
+        "name":  "GPT-6 Astra",
+        "input":  1000,
+        "output":  5000,
+        "cache_read":  100
+    },
+    {
+        "id":  "gpt-6-luna",
+        "name":  "GPT-6 Luna",
+        "input":  10,
+        "output":  50,
+        "cache_read":  1
+    },
+    {
+        "id":  "gpt-6-sol",
+        "name":  "GPT-6 Sol",
+        "input":  200,
+        "output":  1000,
+        "cache_read":  20
+    },
+    {
+        "id":  "grok-4.6",
+        "name":  "Grok 4.6",
+        "input":  200,
+        "output":  600,
+        "cache_read":  50
+    },
+    {
+        "id":  "grok-4.7",
+        "name":  "Grok 4.7",
+        "input":  200,
+        "output":  600,
+        "cache_read":  50
+    },
+    {
+        "id":  "kimi-k3-base",
+        "name":  "Kimi K3 (GitHub)",
+        "input":  300,
+        "output":  1500,
+        "cache_read":  30
+    },
+    {
+        "id":  "kimi-k3-copilot",
+        "name":  "Kimi K3 (GitHub)",
+        "input":  300,
+        "output":  1500,
+        "cache_read":  30
+    },
+    {
+        "id":  "kimi-k3",
+        "name":  "Kimi K3",
+        "input":  300,
+        "output":  1500,
+        "cache_read":  30
+    },
+    {
+        "id":  "mai-code-1.1-flash",
+        "name":  "MAI-Code-1.1-Flash",
+        "input":  20,
+        "output":  120,
+        "cache_read":  2
+    },
+    {
+        "id":  "mai-code-1-flash-4th",
+        "name":  "MAI-Code-1.1-Flash",
+        "input":  20,
+        "output":  120,
+        "cache_read":  2
+    },
+    {
+        "id":  "mai-code-1-flash-secondary",
+        "name":  "MAI-Code-1.1-Flash",
+        "input":  20,
+        "output":  120,
+        "cache_read":  2
+    },
+    {
+        "id":  "mai-code-1-flash-tertiary",
+        "name":  "MAI-Code-1.1-Flash",
+        "input":  20,
+        "output":  120,
+        "cache_read":  2
+    },
+    {
+        "id":  "claude-haiku-4.5",
+        "name":  "Claude Haiku 4.5",
+        "input":  100,
+        "output":  500,
+        "cache_read":  10
+    },
+    {
+        "id":  "gpt-41-copilot",
+        "name":  "GPT-4.1 Copilot",
+        "input":  200,
+        "output":  800,
+        "cache_read":  50
+    },
+    {
+        "id":  "gpt-4",
+        "name":  "GPT 4",
+        "input":  250,
+        "output":  1000,
+        "cache_read":  125
+    },
+    {
+        "id":  "gpt-4-0613",
+        "name":  "GPT 4",
+        "input":  250,
+        "output":  1000,
+        "cache_read":  125
+    },
+    {
+        "id":  "gpt-4-0125-preview",
+        "name":  "GPT 4 Turbo",
+        "input":  1000,
+        "output":  3000,
+        "cache_read":  0
+    }
+]

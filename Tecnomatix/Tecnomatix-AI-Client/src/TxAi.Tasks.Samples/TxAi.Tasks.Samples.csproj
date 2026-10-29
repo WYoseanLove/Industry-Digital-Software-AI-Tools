@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>TxAi.Tasks.Samples</AssemblyName>
+    <RootNamespace>TxAi.Tasks.Samples</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Contracts is already loaded by the add-in; do not copy it next to the task DLL. -->
+    <ProjectReference Include="..\TxAi.Contracts\TxAi.Contracts.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <Reference Include="Tecnomatix.Engineering">
+      <HintPath>$(TxInstallDir)Tecnomatix.Engineering.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
