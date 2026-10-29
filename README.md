@@ -1,8 +1,36 @@
+<a id="english"></a>
+
 # Industry-Digital-Software-AI-Tools
 
-> Global project. All hand-written `.md` files are bilingual: English first, Chinese second (after the first `---`). Agent replies follow the user's input language and end with an estimated token / cost footer (see `.github/copilot-instructions.md`, rules G1-G3, and `tools/token_pricing.md`).
+![Industry-Digital-Software-AI-Tools — Prompt, Skill, Run, Report](docs/Industry-Digital-Software-AI-Tools_Promo_Minimal.png)
+
+<p align="center">
+  <strong>Say it. AI builds it.</strong><br>
+  Natural-language automation for manufacturing software.
+</p>
+
+<p align="center">
+  <a href="#english">English</a> · <a href="#中文">简体中文</a><br>
+  <strong>Tecnomatix · NX · Vismockup · CATIA · Excel / PowerPoint</strong>
+</p>
+
+### At a glance
+
+| One workflow | Reusable knowledge | Controlled execution |
+|---|---|---|
+| Describe a need, generate a skill, build and run it, then report the results. | Product manuals, exact API references and topic-based Memory guide each task. | Environment checks, build-before-run and confirmation before data changes. |
+
+**Prompt → Skill → Run → Report**
+
+### Explore
+
+[Overview](#en-overview) · [Setup & detection](#en-setup) · [NX development](#en-nx) · [Version adaptation](#en-versions) · [Memory](#en-memory) · [Repository layout](#en-layout) · [API documentation](#en-api)
+
+> **Documentation:** English first, Chinese second. Main hand-written Markdown files are bilingual; reference material may retain its source language. Agent replies follow the user's language and include an estimated token / cost footer. See [.github/copilot-instructions.md](.github/copilot-instructions.md) and [token pricing](tools/token_pricing.md).
 
 > **Tecnomatix first-use reminder:** the script is `txai.ps1`. On detecting Tecnomatix, the Agent's environment check automatically runs `txai.ps1 setup` to build missing plugin DLLs and create `%LOCALAPPDATA%\TxAi\txai.config.json` with the Task whitelist. **Automatic preparation is not deployment:** you must then run the printed copy command in an administrator PowerShell, restart Process Simulate, open a Study and click **AI > AI Bridge**. Setup must return 0 before skills can run. Full configuration and verification instructions are in section 2.3.
+
+<a id="en-overview"></a>
 
 ## 1. Purpose
 
@@ -41,11 +69,13 @@ Exact requirements depend on the vendor agreement, software version, edition, mo
 
 `USABLE`, a successful `setup`, COM registration, installed headers / assemblies and a successful API call indicate technical readiness only. **They do not verify legal authorization.** The current scripts do not implement vendor entitlement verification; this README states usage conditions, not an enforceable license gate. Users must also obtain permission before sharing proprietary API documentation or customer data with an AI service.
 
+<a id="en-setup"></a>
+
 ## 2. Automatic Flow When the Project Is Opened (the Agent must run it)
 
 Before handling the first request of every session, run the unified detection script and show the result to the user:
 
-```
+```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File <absolute path>\tools\envcheck.ps1
 ```
 
@@ -136,6 +166,8 @@ How to avoid or fix it:
 5. Elevation is never used; if a step needs administrator rights, run it yourself.
 6. The scripts are plain text: no download, no obfuscation / encoded commands, no hidden windows, no Defender or registry changes (only the user-level `setx` in `envcheck.ps1 install`). Instead of `-ExecutionPolicy Bypass` you can run `Unblock-File` on the repo scripts and use the `RemoteSigned` policy for the current user (`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`), or sign the scripts with your own certificate.
 
+<a id="en-nx"></a>
+
 ## 3. NX Development Environment (NX Open)
 
 Based on `NX/NXOpen_setup.png`: after installation NX has no `UGOPEN` folder (NX Open headers and libraries) by default; it is only installed by running Section 3 of the CAD deployment package with administrator rights. The distilled logic:
@@ -166,6 +198,8 @@ How to run with administrator rights:
   - `True`: `envcheck.ps1 install -NxDeployDir <deployment folder>` runs `Deploy-Application.exe -Section 3` automatically.
   - `False`: only print the commands above to the user and stop; re-check after the user is done. **The Agent must never try `runas` / `Start-Process -Verb RunAs`.**
 
+<a id="en-versions"></a>
+
 ## 4. Version Adaptation
 
 Docs and scripts are written against NX 2512, Tecnomatix 2502, Teamcenter Visualization 2512, CATIA V5-6 B34 and Office 16, but do not depend on a fixed version:
@@ -175,17 +209,21 @@ Docs and scripts are written against NX 2512, Tecnomatix 2502, Teamcenter Visual
 - When writing code, check signatures against the locally installed headers / assemblies (NX: `UGII_BASE_DIR\UGOPEN`; Tecnomatix: `Tecnomatix.Engineering.dll`; COM: object-model members). If the repo API docs differ from the local machine, the local machine wins; note it in the skill description.
 - Never hard-code version numbers in skill source; read them from environment variables or the registry when needed.
 
+<a id="en-memory"></a>
+
 ## 5. Self-learning and Correction
 
 The Agent accumulates experience in the repo's `Memory/` folder, shared through the repo:
 
-- **All lessons learnt / corrections / pitfalls live in `Memory/`** (`learned.md` = user traits + general / environment corrections; the rest are topic files split by topic / situation, such as `env_and_tooling.md`, `task_workflow_rules.md`, and under `Costomer/` `nx_weld_lfo_lwe.md`, `ford_part_numbering.md`; `INDEX.md` is an auto-generated directory). Tier by subject: repository configuration (repo / tooling / environment / workflow rules) -> `Memory/*.md`; anything about the products (NX / Vismockup / CATIA / Tecnomatix, algorithms, API pitfalls, part-number rules) and anything produced by the user's own runs (paths, datasets, benchmark numbers, batch results) -> `Memory/Costomer/`.
+- **All lessons learnt / corrections / pitfalls live in `Memory/`** (`learned.md` = user traits + general / environment corrections; the rest are topic files split by topic / situation, such as `env_and_tooling.md`, `task_workflow_rules.md`, and under `Costomer/` `nx_weld_lfo_lwe.md` and topic files for OEM part-number rules; `INDEX.md` is an auto-generated directory). Tier by subject: repository configuration (repo / tooling / environment / workflow rules) -> `Memory/*.md`; anything about the products (NX / Vismockup / CATIA / Tecnomatix, algorithms, API pitfalls, part-number rules) and anything produced by the user's own runs (paths, datasets, benchmark numbers, batch results) -> `Memory/Costomer/`.
 - **Topic file format**: front matter (`title`, `scope`, `triggers`, `always`, `updated`); entries are `## PREFIX-NN title` + Wrong / Right / Trigger / Evidence (English lines first, Chinese lines second).
 - **Program-level gate**: every runner (`envcheck.ps1`, `txai.ps1`, `nxrun.ps1`, `vmrun.ps1`, `catrun.ps1`, `officerun.ps1`) first runs `tools/memcheck.ps1`: it always prints `learned.md` and `always: true` files; topic files whose scope matches and whose triggers hit the task context (`$env:MFG_TASK_HINT` + runner arguments) are printed in full, scope matches without a trigger hit list only entry titles, others list only file names; it also rebuilds `INDEX.md`; exit code 14 if `learned.md` is missing.
 - At session start read `INDEX.md` + `learned.md`, then the topic files matching the request keywords.
 - When the user points out an error or states a preference, the Agent first appends a record (wrong -> right -> trigger) in the same turn, then fixes it.
 - Before product tasks, check the entries of the matching scope to avoid repeating mistakes; update same-kind entries instead of duplicating; on conflict the user's latest statement wins.
 - Never record passwords, tokens or other secrets; the user may ask to delete an entry at any time.
+
+<a id="en-layout"></a>
 
 ## 6. Layout
 
@@ -200,6 +238,8 @@ Memory/                           All lessons / corrections: learned.md + topic 
 Tecnomatix/  NX/  Vismockup/  Catia/  Office/   Product manuals, API docs, runners, Task
 Teamcenter/                       Reserved
 ```
+
+<a id="en-api"></a>
 
 ## 7. API Documentation: Access and Local Configuration
 
@@ -220,9 +260,37 @@ Vismockup's current manual uses `api_md` (underscore), not `api-md` (hyphen). Bo
 
 ---
 
+<a id="中文"></a>
+
 # Industry-Digital-Software-AI-Tools（中文）
 
+<p align="center">
+  <strong>一句话，AI 搞定制造软件自动化。</strong><br>
+  用自然语言连接需求、程序执行与结果报告。
+</p>
+
+<p align="center">
+  <a href="#english">English</a> · <a href="#中文">简体中文</a><br>
+  <strong>Tecnomatix · NX · Vismockup · CATIA · Excel / PowerPoint</strong>
+</p>
+
+### 核心特点
+
+| 统一工作流 | 可复用知识 | 可控执行 |
+|---|---|---|
+| 描述需求，生成 skill，编译并运行，再整理结果报告。 | 产品手册、精确 API 参考与按主题组织的 Memory 为每次任务提供依据。 | 环境检查、先编译后运行，修改数据前须确认。 |
+
+**需求 → Skill → 运行 → 报告**
+
+### 快速导航
+
+[项目用途](#zh-overview) · [配置与检测](#zh-setup) · [NX 开发环境](#zh-nx) · [版本适配](#zh-versions) · [Memory](#zh-memory) · [仓库目录](#zh-layout) · [API 文档](#zh-api)
+
+> **文档约定：**英文在前，中文在后。主要手写 Markdown 文件保持双语，参考资料可保留源语言。Agent 回复跟随用户输入语言，并附 Token 与费用估算。详见 [.github/copilot-instructions.md](.github/copilot-instructions.md) 与 [Token 计价说明](tools/token_pricing.md)。
+
 > **Tecnomatix 首次使用必读：**脚本名称为 `txai.ps1`。检测到 Tecnomatix 后，Agent 的环境检查会自动运行 `txai.ps1 setup`，编译缺失的插件 DLL，并创建 `%LOCALAPPDATA%\TxAi\txai.config.json` 及 Task 白名单。**自动准备不等于部署完成：**随后必须由用户在管理员 PowerShell 中执行输出的复制命令，重启 Process Simulate，打开 Study 并点击 **AI > AI Bridge**。setup 返回 0 后才能运行 skill。完整配置与验证步骤见第 2.3 节。
+
+<a id="zh-overview"></a>
 
 ## 1. 项目用途
 
@@ -261,11 +329,13 @@ Vismockup's current manual uses `api_md` (underscore), not `api-md` (hyphen). Bo
 
 `USABLE`、`setup` 成功、COM 已注册、存在头文件或程序集，以及 API 调用成功，都只表示技术就绪，**不证明具备合法授权**。当前脚本未实现厂商许可权益核验；本 README 声明使用条件，不构成强制许可证门禁。向 AI 服务提供专有 API 文档或客户数据前，也必须取得相应许可。
 
+<a id="zh-setup"></a>
+
 ## 2. 打开项目时的自动流程（Agent 必须执行）
 
 每个会话第一次处理请求之前，先运行统一检测脚本，并把结果输出给用户：
 
-```
+```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File <绝对路径>\tools\envcheck.ps1
 ```
 
@@ -357,6 +427,8 @@ runner 会在你的电脑上编译并加载小型程序，这类行为部分杀�
 5. 不会自动提权；若某步需要管理员权限，请用户自己执行。
 6. 脚本都是纯文本：不下载、不混淆 / 编码命令、不开隐藏窗口、不改 Defender 或注册表（仅 `envcheck.ps1 install` 里有用户级 `setx`）。也可以不用 `-ExecutionPolicy Bypass`：对仓库脚本执行 `Unblock-File`，并把当前用户的策略设为 `RemoteSigned`（`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`），或用自己的证书给脚本签名。
 
+<a id="zh-nx"></a>
+
 ## 3. NX 二次开发环境（NX Open）
 
 依据 `NX/NXOpen_setup.png`：NX 安装后默认没有 `UGOPEN` 文件夹（NX Open 头文件与库），必须以管理员权限运行 CAD 部署包的 Section 3 才会安装。提炼出的逻辑：
@@ -387,6 +459,8 @@ runner 会在你的电脑上编译并加载小型程序，这类行为部分杀�
   - `True`：`envcheck.ps1 install -NxDeployDir <部署目录>` 自动执行 `Deploy-Application.exe -Section 3`。
   - `False`：只向用户输出上述命令并停止，等用户处理后复检。**Agent 不得尝试 `runas` / `Start-Process -Verb RunAs`。**
 
+<a id="zh-versions"></a>
+
 ## 4. 版本适配
 
 文档与脚本基于 NX 2512、Tecnomatix 2502、Teamcenter Visualization 2512、CATIA V5-6 B34、Office 16 编写，但不依赖固定版本：
@@ -396,17 +470,21 @@ runner 会在你的电脑上编译并加载小型程序，这类行为部分杀�
 - 写代码时以本机安装的头文件 / 程序集为准核对签名（NX：`UGII_BASE_DIR\UGOPEN`；Tecnomatix：`Tecnomatix.Engineering.dll`；COM：对象模型成员）。仓库 API 文档与本机不一致时，以本机为准，并在 skill 说明里标注。
 - 不要把版本号写死到 skill 源码；需要时从环境变量或注册表读取。
 
+<a id="zh-memory"></a>
+
 ## 5. 自学习与纠错
 
 Agent 通过仓库内的 `Memory/` 积累经验，随仓库共享：
 
-- **所有 lessons learnt / 纠错 / 踩坑文件一律放在 `Memory/`**（`learned.md` 用户特点 + 通用 / 环境纠错；其余为按主题 / 情境拆分的主题文件，如 `env_and_tooling.md`、`task_workflow_rules.md`，以及 `Costomer/` 下的 `nx_weld_lfo_lwe.md`、`ford_part_numbering.md`；`INDEX.md` 为自动生成的目录）。按主题分层：仓库配置（仓库 / 工具 / 环境 / 工作流规则）-> `Memory/*.md`；涉及产品的一切（NX / Vismockup / CATIA / Tecnomatix、算法、API 坑、零件号规则）以及用户每次运行产生的内容（路径、数据集、对比数字、批量结果）-> `Memory/Costomer/`。
+- **所有 lessons learnt / 纠错 / 踩坑文件一律放在 `Memory/`**（`learned.md` 用户特点 + 通用 / 环境纠错；其余为按主题 / 情境拆分的主题文件，如 `env_and_tooling.md`、`task_workflow_rules.md`，以及 `Costomer/` 下的 `nx_weld_lfo_lwe.md` 和 OEM 零件号规则主题文件；`INDEX.md` 为自动生成的目录）。按主题分层：仓库配置（仓库 / 工具 / 环境 / 工作流规则）-> `Memory/*.md`；涉及产品的一切（NX / Vismockup / CATIA / Tecnomatix、算法、API 坑、零件号规则）以及用户每次运行产生的内容（路径、数据集、对比数字、批量结果）-> `Memory/Costomer/`。
 - **主题文件格式**：开头 front matter（`title`、`scope`、`triggers`、`always`、`updated`），条目为 `## 前缀-序号 标题` + 错误 / 正确 / 触发 / 证据。
 - **程序级门禁**：所有 runner（`envcheck.ps1`、`txai.ps1`、`nxrun.ps1`、`vmrun.ps1`、`catrun.ps1`、`officerun.ps1`）启动时先执行 `tools/memcheck.ps1`：始终打印 `learned.md` 与 `always: true` 文件；scope 匹配且 triggers 命中任务上下文（`$env:MFG_TASK_HINT` + runner 参数）的主题文件完整打印，scope 匹配未命中的只列条目标题，其它只列文件名；同时重建 `INDEX.md`；`learned.md` 缺失则退出码 14。
 - 会话启动时读取：`INDEX.md` + `learned.md`，再按请求关键词读取命中的主题文件。
 - 用户指出错误或表达偏好时，Agent 当轮先追加记录（错误 -> 正确做法 -> 触发条件），再修正。
 - 执行相关产品任务前按范围核对条目，避免重犯；同类条目更新而不是重复添加，冲突时以用户最新说法为准。
 - 不记录密码、令牌等敏感信息；用户可随时要求删除某条。
+
+<a id="zh-layout"></a>
 
 ## 6. 目录
 
@@ -421,6 +499,8 @@ Memory/                           全部 lessons / 纠错：learned.md + 主题�
 Tecnomatix/  NX/  Vismockup/  Catia/  Office/   各产品手册、API 文档、runner、Task
 Teamcenter/                       预留
 ```
+
+<a id="zh-api"></a>
 
 ## 7. API 文档获取与本地配置
 

@@ -57,7 +57,7 @@ Read the top compound part under the station and its children: what parts exist 
 - Fixtures: clamp count (about 90 clamps on a floor fixture is normal); the clamp close order matters for pick / place analysis.
 
 ### 2.4 Step 5: sequence and cycle time
-- Per-robot cycle time = duration of its compound operation. The longest robot is the bottleneck and equals the station total when it dominates.
+- Treat compound-operation duration as model data, not automatically production cycle time. First inspect unusually long location durations (especially HOME), waits, parallel branches and scheduling links; identify a bottleneck only when these dependencies and the production scope have been verified.
 - `in/out` links, wait-device commands, and interference zones give the dependencies between robots.
 - `EnterZone / ExitZone(n):R1&R2` in the robot program are interference zones: two robots share space and are sequenced.
 - Operation types: weld operation with weld points = spot welding; seam = laser / arc / sealer; glue operations (`GLUE`, `Purge`) = adhesive; `Service` = maintenance (tip dress / gun service).
@@ -99,7 +99,7 @@ Evidence from the data:
 | Fixture | many clamps, locating pins | usually transfer / light fixture |
 | Weld count | tens of points per robot | many points, short per-point time |
 
-Procedure: count weld points per (robot, gun, model, part pair). Pairs of two different parts = GEO joins; single-part points = re-spot / touch-up / sealing points. Operation names (`fengping` = sealing, `service`, `glue`) support but do not decide. State clearly that single-part points and station roles are **inferred** when no explicit marker exists, and that stations without operations (empty compound operations) can only be described as layout.
+Procedure: count weld points per (robot, gun, model, part pair), then compare newly introduced components, fixture location and upstream joins. Different-part pairs prove a joint, not necessarily GEO: downstream re-spot can weld the same pairs. Empty or single-part assignments alone do not prove re-spot or sealing. Operation names support but do not decide. Mark unsupported station roles as **inferred**; empty operation folders establish missing program evidence, not an idle real station.
 
 For each GEO station report: "robot X (gun Y) joins part A + part B, N points per model".
 
@@ -185,7 +185,7 @@ A floor station with three models, a turntable and 8 robots resolved as: area = 
 - 夹具：夹爪数量（地板夹具约 90 个夹爪属正常）；夹爪闭合顺序对抓放分析很重要。
 
 ### 2.4 步骤 5：顺序与节拍
-- 单机器人节拍 = 其复合操作时长。最长的机器人是瓶颈；当它占主导时等于工位总节拍。
+- 复合操作时长只是模型数据，不能自动当作生产节拍；先检查异常长的位置时长（尤其 HOME）、等待、并行分支与排程连接，只有依赖关系和生产范围均核实后才能判断瓶颈。
 - `in/out` 链接、等待设备命令和干涉区给出机器人之间的依赖。
 - 机器人程序里的 `EnterZone / ExitZone(n):R1&R2` 是干涉区：两台机器人共用空间，需要排序。
 - 操作类型：带焊点的焊接操作 = 点焊；seam = 激光 / 弧焊 / 密封；涂胶操作（`GLUE`、`Purge`）= 胶；`Service` = 维护（修磨 / 枪保养）。
@@ -227,7 +227,7 @@ A floor station with three models, a turntable and 8 robots resolved as: area = 
 | 夹具 | 多夹爪、定位销 | 通常是转运 / 轻型夹具 |
 | 焊点数量 | 每机器人数十点 | 点数多、单点时间短 |
 
-方法：按（机器人、焊枪、车型、零件对）统计焊点数。两个不同零件的零件对 = GEO 连接；单零件焊点 = 补焊 / 修补 / 密封点。操作名称（`fengping` = 密封、`service`、`glue`）只作佐证，不作决定。没有显式标记时，必须说明单零件焊点和工位角色是**推断**；没有操作（复合操作为空）的工位只能描述布局。
+方法：按（机器人、焊枪、车型、零件对）统计焊点数，再比较新增零件、定位夹具和上游连接。不同零件配对只证明连接关系，不能单独证明是 GEO，下游补焊也可能焊同一零件对；空关联或单零件关联也不能单独证明补焊或密封。操作名称只作佐证，不作决定。无充分证据的工位角色标为**推断**；操作文件夹为空代表缺少程序证据，不证明实际工位不工作。
 
 每个 GEO 工位按下面格式汇报："机器人 X（焊枪 Y）焊接零件 A + 零件 B，每车型 N 点"。
 
