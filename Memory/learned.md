@@ -7,10 +7,6 @@ Rules: see "Self-learning and Correction" in `.github/copilot-instructions.md`. 
 
 Format / 格式: `- [date] English / 中文 (source: the user's words in brief / 来源)`
 
-- [2026-10-31] [通用] Wrong: using a Ford-specific example in the README | Right: describe OEM part-number rules generically in both languages without renaming customer-specific files | Trigger: editing README examples. / 错误：README 使用 Ford 专属示例 | 正确：中英文均使用通用的 OEM 零件号规则描述，不重命名客户专属文件 | 触发：编辑 README 示例。（来源：用户要求“这个 readme 中有关于 ford 的改成 OEM”）
-
-- [2026-10-29] [通用] Wrong: choosing code-driven UI automation when a supported API exists, or treating a failed API call or guessed command ID as proof of missing support | Right: use supported APIs first; only when the required operation is confirmed unsupported by the API may code-driven UI automation be used, and verify the actual result after execution | Trigger: choosing an automation approach. / 错误：已有 API 支持时使用代码驱动 UI，或把 API 调用失败、猜测的命令标识无效当作不支持的证明 | 正确：优先使用受支持的 API；当且仅当确认所需操作无 API 支持时，才能使用代码驱动 UI 自动化，执行后必须验证实际结果 | 触发：选择自动化实现方式。（来源：用户明确要求“当且仅当 API 不支持”）
-
 - [2026-10-19] Communicate in Chinese when the user writes Chinese; keep answers short, no emoji. / 用户用中文时用中文沟通，回答简短、不用 emoji。
 - [2026-10-19] The user describes flows with images / screenshots; if the model cannot view images, say so and ask the user to confirm the extracted result. / 习惯用图片 / 截图描述流程；模型若不能看图，需如实说明并让用户确认提取结果。
 - [2026-10-23] The project is global: every hand-written `.md` is bilingual, English first, Chinese second (rule G3). / 项目面向全球：所有手写 `.md` 中英双语，英文在前、中文在后（规则 G3）。
