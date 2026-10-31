@@ -42,6 +42,7 @@ use `string.Format(...)`. Revolute joints & rotations are in **RADIANS** (`deg *
 | 16 | [16-api-surface-reference.md](16-api-surface-reference.md) | Confirm the exact class/member name, its namespace area, or the version it was introduced in (v10.1–v12.1.3). | full by-topic class/method reference |
 | 17 | [17-auto-Weld-Operation-Teach-skills.md](17-auto-Weld-Operation-Teach-skills.md) | Auto-teach every weld point in a weld operation: resolve Robot/Gun from the trajectory, shrink gun opening, sweep orientation about local Z for a reachable/collision-free/non-singular pose, keep configs consistent across points, report unresolved points. | `DoesInverseExist`, `IsPoseWristSingular`, `TeachCurrentRobotConfiguration`, `GetCollisionStateForObjects`, `TxRobotConfigurationData` |
 | 18 | [18-Tecnomatix_Process_Simulate_Station_Analysis.md](18-Tecnomatix_Process_Simulate_Station_Analysis.md) | Analyze an OPEN Study read-only: tree/assembly/kinematics, BIW area, gripper pick/place, GEO vs re-spot station, part pairs per GEO station, sequence/cycle time; analysis workflow and report template (no API code). 分析已打开仿真的工艺流程、工位类型、GEO/补焊判断。 | `AnalyzeStudyProcess`, `AnalyzeStudyWeldParts`, `TxWeldOperation`, OLP `# Destination`, GEO, re-spot, BIW |
+| 19 | [19.human-creation-gender-height.md](19.human-creation-gender-height.md) | Create a Jack/Jill human with a specified gender and height; place it at an existing human and align toe height; verify new IDs and actual parameters. Creation command and height-setting calls still need verification/completion. 创建指定性别和身高的人体、复制位置并对齐脚趾高度、回读验证；创建命令与身高调用仍待核对补全。 | `TxHuman`, Jack, Jill, Create Human, gender, height, stature, `AbsoluteLocation`, `GetJointLocation`, 创建人体, 女性, 身高 |
 
 ---
 
@@ -64,6 +65,7 @@ use `string.Format(...)`. Revolute joints & rotations are in **RADIANS** (`deg *
 - "what is the exact class/method/version" → **16**
 - auto teach weld points / weld trajectory orientation sweep / consistent robot config across a path → **17**
 - analyze station / process flow of an open study / GEO vs re-spot / BIW area / pick-place / 工位工艺分析 → **18**
+- create human / Jack / Jill / gender / height / stature / toe-height alignment / 创建人体 / 性别 / 身高 / 脚趾高度对齐 → **19** (creation/scaling calls need verification / 创建与缩放调用待核对)
 
 ---
 
