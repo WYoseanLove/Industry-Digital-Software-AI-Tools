@@ -1,19 +1,29 @@
 ---
 title: Environment and tooling pitfalls (PowerShell, NX runner, encoding) / 环境与工具使用坑（PowerShell、NX runner、编码）
 scope: all
-triggers: 硬编码, hardcoded, 死路径, 版本适配, version, envdetect, Program Files, powershell, 编码, encoding, 乱码, garbled, 中文, Chinese, build, run, nxrun, vmrun, 进程, process, ugraf, argv, 编译, compile, 重定向, redirect, 日志, log, buffered, antivirus, 杀毒, Defender, Add-Type, host, 宿主, Task, Directory.Build, 配置文件, config, Git, browser, 浏览器, screenshot, 截图
+triggers: 硬编码, hardcoded, 死路径, 版本适配, version, envdetect, Program Files, powershell, 编码, encoding, 乱码, garbled, 中文, Chinese, build, run, nxrun, vmrun, 进程, process, ugraf, argv, 编译, compile, 重定向, redirect, 日志, log, buffered, antivirus, 杀毒, Defender, Add-Type, host, 宿主, Task, Directory.Build, 配置文件, config, Git, browser, 浏览器, screenshot, 截图, MCP, Claude Desktop, 通讯, communication
 always: false
-updated: 2026-10-29
+updated: 2026-11-01
 ---
 # Environment and tooling pitfalls / 环境与工具使用坑
 
+## ET-13 Local MCP adapts existing runners; preserve environment and structured arguments / 本地 MCP 适配现有 runner，保持环境与结构化参数
+- Wrong: treating file access as software execution, replacing runners with a new loader, passing JSON through nested command-line quoting, or testing only with the parent's complete environment and assuming filtered Desktop launches will also work.
+- Right: use stdio MCP with absolute Node/server paths; merge the generated mcpServers fragment into existing Desktop settings. Bootstrap the Windows environment before starting the runner PowerShell process: restoring PATHEXT inside an already-started -File session can be too late for executable-discovery caches, and a filtered launch can leave a nonempty but incomplete PATHEXT containing only .CPL. Restore missing Machine/User settings (User takes precedence), derive missing Program Files/profile/ProgramData directories from Windows special folders, and merge persistent PATH and PATHEXT while preserving caller entries. This must not modify persistent settings or the existing runners; bootstrap environment JSON stays inside local child-process transport, never tool output. Await bootstrap process closure after cancellation. Test both complete and minimal SDK launches. Set MFG_TASK_HINT, poll jobs to completion, read all Memory/output pages and require successful setup/build plus genuine user approval before run; caller confirmation flags are not independent authorization.
+- Trigger: MCP, Claude Desktop, runner integration, JSON arguments, environment inheritance.
+- Evidence: a minimal SDK launch reproduced all three false missing-tool reports and absent NX variables despite an inherited-environment test passing; tools/mcp tests now cover recovery, override preservation, UTF-8, argument boundaries and Tecnomatix JSON.
+- 错误：把文件访问当作软件执行、用新加载器替换 runner、嵌套命令行引号传 JSON，或只测试完整父进程环境便推定经过过滤的 Desktop 启动也能成功。
+- 正确：使用 stdio MCP 和 Node/服务绝对路径，将生成的 mcpServers 片段合并到现有 Desktop 设置。在启动 runner PowerShell 进程前准备 Windows 环境：在已经启动的 -File 会话内恢复 PATHEXT，可能来不及修正可执行命令发现缓存，过滤环境还可能留下非空但仅含 .CPL 的残缺 PATHEXT。从 Machine/User 设置恢复缺失值（User 优先），从 Windows 特殊目录恢复缺失的 Program Files/个人目录/ProgramData 变量，合并持久 PATH 和 PATHEXT 并保留调用方条目；不修改持久设置或原有 runner。准备阶段的环境 JSON 仅用于本地子进程传输，不返回为工具输出。取消后等待环境准备进程实际关闭。测试完整和最小 SDK 启动环境。设置 MFG_TASK_HINT，轮询任务至结束、读完 Memory/输出分页，run 前要求 setup/build 成功及真实用户批准；调用方确认标志不是独立授权。
+- 触发：MCP、Claude Desktop、runner 接入、JSON 参数、环境继承。
+- 证据：最小 SDK 启动复现三项编译工具误报缺失及 NX 变量缺失，而完整继承环境测试成功；tools/mcp 测试现覆盖恢复、覆盖值保留、UTF-8、参数边界和 Tecnomatix JSON。
+
 ## ET-11 Public repository name and private output boundaries / 公开仓库名称与私有产物边界
 - Wrong: publishing generated skills or customer memory, dropping their empty folders, retaining the old repository name, or treating Vismockup/api-md as the API reference path.
-- Right: use Industry-Digital-Software-AI-Tools; keep product Task, Memory/Costomer, and local API reference folders through .gitkeep exceptions, ignore all other contents and the generated Memory/INDEX.md, and preserve local files. Exclude contents of Tecnomatix/Tecnomatix_Engineering, NX/api-md, Catia/api-md and Vismockup/api_md from Git; Vismockup/api_md is the correct path. Document cookbook availability and authorized local API configuration rather than GitHub publishing instructions. Ignore rules do not remove previously tracked data or Git history.
+- Right: use Industry-Digital-Software-AI-Tools; keep Datas, product Task, Memory/Costomer, and local API reference folders through .gitkeep exceptions, ignore all other contents and the generated Memory/INDEX.md, and preserve local files. Exclude contents of Tecnomatix/Tecnomatix_Engineering, NX/api-md, Catia/api-md and Vismockup/api_md from Git; Vismockup/api_md is the correct path. Document cookbook availability and authorized local API configuration rather than GitHub publishing instructions. Ignore rules do not remove previously tracked data or Git history.
 - Trigger: GitHub, open source, rename, Task, Costomer, gitignore, 开源, 更名, 忽略。
 - Evidence: repository .gitignore, README.md, and product Task / Memory/Costomer .gitkeep files.
 - 错误：发布已生成技能或客户记忆、丢失空目录、继续使用旧仓库名称，或误把 Vismockup/api-md 当作 API 参考目录。
-- 正确：使用 Industry-Digital-Software-AI-Tools；各产品 Task、Memory/Costomer 和本地 API 参考目录通过 .gitkeep 例外保留目录，其余内容及自动生成的 Memory/INDEX.md 均忽略，保留本地文件。Git 排除 Tecnomatix/Tecnomatix_Engineering、NX/api-md、Catia/api-md 和 Vismockup/api_md 内的其他内容；Vismockup/api_md 才是正确路径。说明 cookbook 开放及获授权 API 的本地配置，不再保留 GitHub 发布操作说明。忽略规则不会移除已跟踪数据或 Git 历史。
+- 正确：使用 Industry-Digital-Software-AI-Tools；Datas、各产品 Task、Memory/Costomer 和本地 API 参考目录通过 .gitkeep 例外保留目录，其余内容及自动生成的 Memory/INDEX.md 均忽略，保留本地文件。Git 排除 Tecnomatix/Tecnomatix_Engineering、NX/api-md、Catia/api-md 和 Vismockup/api_md 内的其他内容；Vismockup/api_md 才是正确路径。说明 cookbook 开放及获授权 API 的本地配置，不再保留 GitHub 发布操作说明。忽略规则不会移除已跟踪数据或 Git 历史。
 - 触发：GitHub、开源、更名、Task、Costomer、gitignore、忽略。
 - 证据：仓库 .gitignore、README.md 及各产品 Task / Memory/Costomer 中的 .gitkeep 文件。
 
@@ -47,11 +57,11 @@ updated: 2026-10-29
 
 ## ET-12 Wait for GUI exports before validating files / 校验文件前等待 GUI 导出完成
 - Wrong: assuming direct invocation of a GUI executable from an interactive PowerShell terminal waits until its output files are written.
-- Right: for a one-shot headless browser export, use an isolated temporary profile and `Start-Process -Wait -PassThru`; check the exit code and output timestamp before inspecting the image or cleaning up the profile. Do not stop unrelated browser processes.
+- Right: for a one-shot headless browser export, use an isolated temporary profile and `Start-Process -Wait -PassThru`; check the exit code and output timestamp before inspecting the image or cleaning up the profile. Inspect the actual screenshot even when DOM geometry checks pass: an integrated-browser element capture can contain a mismatched viewport. For a standalone diagram, render the SVG directly in the isolated headless browser when the integrated screenshot is incorrect. Do not stop unrelated browser processes.
 - Trigger: browser screenshot or another GUI export appears to return before updating the output file.
 - Evidence: explicit process waiting makes screenshot output validation occur after the browser finishes.
 - 错误：认为在交互式 PowerShell 终端中直接调用 GUI 可执行程序，一定会等到输出文件写入后才返回。
-- 正确：单次无界面浏览器导出使用独立临时配置和 `Start-Process -Wait -PassThru`；检查退出码及输出时间戳后再查看图片、清理配置，不终止无关浏览器进程。
+- 正确：单次无界面浏览器导出使用独立临时配置和 `Start-Process -Wait -PassThru`；检查退出码及输出时间戳后再查看图片、清理配置。即使 DOM 几何校验通过，也必须检查实际截图：集成浏览器的元素截图可能捕获错位视口。独立流程图在集成截图错误时，改用独立无界面浏览器直接渲染 SVG。不终止无关浏览器进程。
 - 触发：浏览器截图或其它 GUI 导出命令似乎在文件更新前已返回。
 - 证据：显式等待进程可确保截图文件校验发生在浏览器完成导出之后。
 
