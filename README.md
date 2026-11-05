@@ -24,7 +24,7 @@
 
 ### Explore
 
-[Overview](#en-overview) · [Setup & detection](#en-setup) · [NX development](#en-nx) · [Version adaptation](#en-versions) · [Memory](#en-memory) · [Repository layout](#en-layout) · [API documentation](#en-api)
+[Overview](#en-overview) · [Setup & detection](#en-setup) · [NX development](#en-nx) · [Version adaptation](#en-versions) · [Memory](#en-memory) · [Repository layout](#en-layout) · [API documentation](#en-api) · [MCP server](#en-mcp)
 
 > **Documentation:** English first, Chinese second. Main hand-written Markdown files are bilingual; reference material may retain its source language. Agent replies follow the user's language and include an estimated token / cost footer. See [.github/copilot-instructions.md](.github/copilot-instructions.md) and [token pricing](tools/token_pricing.md).
 
@@ -52,6 +52,7 @@ Common conventions:
 - Before writing API code, check the product's API docs for exact signatures; a DLL whose `build` failed must never be `run`; a skill that modifies / saves / overwrites data needs user confirmation first.
 - The Agent must never elevate by itself; steps that need administrator rights are only shown to the user.
 - Full rules: [.github/copilot-instructions.md](.github/copilot-instructions.md).
+- **Claude Desktop:** a local stdio MCP adapter is available in [tools/mcp](tools/mcp/README.md). It exposes repository text/skill tools and calls these existing runners without changing software execution. See the guide for dependency installation, generated JSON configuration, approvals and verification.
 
 ### 1.1 Required Software and API Authorization
 
@@ -232,6 +233,7 @@ The Agent accumulates experience in the repo's `Memory/` folder, shared through 
 AGENTS.md  CLAUDE.md             Entry points for Codex / Claude clients, pointing to the file above
 tools/envcheck.ps1                Environment and software detection / install (section 2)
 tools/memcheck.ps1                Memory gate (called by every runner)
+tools/mcp/                        Local stdio MCP server, PowerShell adapter and tests (section 8)
 tools/tokencost.ps1               Token and cost estimate (rule G2); see tools/token_pricing.md
 tools/hostbuild.ps1  tools/hosts/ Source of the small run hosts (compiled with csc on first use into %LOCALAPPDATA%\Industry-Digital-Software-AI-Tools\bin; no inline Add-Type, no signing)
 Memory/                           All lessons / corrections: learned.md + topic files + INDEX.md (section 5)
@@ -257,6 +259,50 @@ After obtaining authorized documentation, extract it into the corresponding dire
 | Vismockup / Teamcenter Visualization | `Vismockup/api_md/` |
 
 Vismockup's current manual uses `api_md` (underscore), not `api-md` (hyphen). Both spellings are ignored by Git, but configure the files under `api_md` so existing lookup paths work. These API directories are local-only and excluded by `.gitignore`; adding the rules does not delete local files or untrack files already in Git. Before generating a skill, ensure the relevant API indexes can be read and that the documentation matches the installed software version.
+
+<a id="en-mcp"></a>
+
+## 8. Local MCP Server (Claude Desktop)
+
+The [local MCP server](tools/mcp/README.md) connects Claude Desktop to this checkout over **stdio**. It adds repository reading, skill source/document writing and runner job tools while reusing the existing PowerShell runners, COM automation, NX hosts and Tecnomatix AI Bridge. Direct runner use remains unchanged. It does not install manufacturing software or grant software/API licenses.
+
+### 8.1 Installation and connection
+
+Requirements: **Node.js 20+** (LTS recommended), npm, 64-bit Windows PowerShell and the normal build/software prerequisites in section 2. Replace the placeholders below with absolute paths:
+
+```powershell
+Set-Location '<RepoRoot>\tools\mcp'
+& '<NpmCmdAbsolutePath>' ci --ignore-scripts --no-audit --no-fund
+& '<NodeExeAbsolutePath>' '<RepoRoot>\tools\mcp\server.mjs' --print-config
+```
+
+Back up `%APPDATA%\Claude\claude_desktop_config.json`, then merge the generated `mcpServers` object into its existing top-level JSON object. Preserve other servers and settings; do not replace the entire file or duplicate the `mcpServers` key. Fully quit and restart Claude Desktop, then check **Settings > Developer** for `industry-digital-software`.
+
+Claude starts Node automatically; no HTTP port, API key, global MCP package, `cwd` setting or manually started server is required. Regenerate the configuration after moving Node or the checkout. At the start of each conversation, explicitly request `repository_context`; Desktop must not be assumed to discover the repository's Agent instructions automatically.
+
+### 8.2 Tools and execution workflow
+
+| Tool | Purpose |
+|---|---|
+| `repository_context` | Read startup rules, README and Memory without running software. |
+| `repository_read` | Read supported repository text files with pagination. |
+| `repository_list` | List repository directories with pagination. |
+| `skill_write` | Write source/Markdown only under a product's `Task/<Skill>`; overwrites require approval. |
+| `runner_start` | Start `environment`, `setup`, `ping` (Tecnomatix only), `build` or `run` jobs. |
+| `runner_status` | Retrieve job status, paginated output and the actual exit code. |
+
+Follow this sequence: `repository_context` → environment detection → product `setup` → API reference checks and skill creation → `build` → approved `run`. Supply a meaningful `taskHint` to `runner_start`, read every Memory/output page, use only `USABLE` products, and require setup/build exit 0. Environment detection can perform the existing Tecnomatix local preparation; it is not purely read-only.
+
+Build/run requires `skill` and `authorized: true`; every run also requires genuine user approval and `userConfirmed: true`, including read-only skills. Set `overwriteConfirmed: true` only after approval to overwrite a skill file. **These flags are caller assertions, not independent permission checks or human approval dialogs; keep Desktop action-tool approvals enabled.** NX/COM arguments use the string array `args`; Tecnomatix uses the JSON object `argsJson`.
+
+A job ID means only that execution started. Success requires **`status: "completed"` and `exitCode: 0`**. Poll `runner_status` while running and read output until `nextOffset` reaches `outputLength`. Only one runner or skill write may be active at a time. Setup/build records reset when the MCP server restarts; an existing DLL cannot run without a successful build in that MCP session. The default timeout is 120 seconds (`timeoutSeconds`: 10–3600). Timeout, output above 4 MiB or MCP disconnection stops the runner process tree; inspect partial results before retrying.
+
+### 8.3 Environment recovery, boundaries and verification
+
+- **Filtered Desktop environments:** before launching runner PowerShell, the adapter restores missing Windows Machine/User settings and standard directories, and merges persistent `PATH` / `PATHEXT` entries while preserving caller entries and nonempty scalar overrides. Recovery affects child processes only, not persistent Windows settings or existing runners. It cannot invent missing NX paths/licenses or install tools. Fully restart Claude after changing user environment variables; correct invalid explicit server `env` overrides.
+- **Access boundaries:** text access stays inside the checkout; skill writes stay under product `Task/<Skill>` directories. No arbitrary shell tool, automatic elevation or new DLL loader is exposed. Compiled skills are **not sandboxed** and may access external input/output paths through runner arguments; approval must cover those targets. Local MCP does not make the Claude model local; do not send secrets or proprietary/customer data without authorization.
+- **Verification:** from the MCP directory, run `& '<NpmCmdAbsolutePath>' test`. Tests cover protocol/tools, path restrictions, execution gates, approval flags, pagination, timeouts, cancellation, filtered-environment recovery and PowerShell argument/JSON transport. Optional live checks and detailed troubleshooting are in the [MCP guide](tools/mcp/README.md).
+- **Troubleshooting:** for `ERR_MODULE_NOT_FOUND`, install the locked dependencies with `npm ci`; for a missing connection, check generated paths/JSON and fully restart Desktop. Read full runner output on setup failure rather than bypassing it. Logs are under `%APPDATA%\Claude\logs` (`mcp.log` and `mcp-server-industry-digital-software.log`).
 
 ---
 
@@ -284,7 +330,7 @@ Vismockup's current manual uses `api_md` (underscore), not `api-md` (hyphen). Bo
 
 ### 快速导航
 
-[项目用途](#zh-overview) · [配置与检测](#zh-setup) · [NX 开发环境](#zh-nx) · [版本适配](#zh-versions) · [Memory](#zh-memory) · [仓库目录](#zh-layout) · [API 文档](#zh-api)
+[项目用途](#zh-overview) · [配置与检测](#zh-setup) · [NX 开发环境](#zh-nx) · [版本适配](#zh-versions) · [Memory](#zh-memory) · [仓库目录](#zh-layout) · [API 文档](#zh-api) · [MCP 服务器](#zh-mcp)
 
 > **文档约定：**英文在前，中文在后。主要手写 Markdown 文件保持双语，参考资料可保留源语言。Agent 回复跟随用户输入语言，并附 Token 与费用估算。详见 [.github/copilot-instructions.md](.github/copilot-instructions.md) 与 [Token 计价说明](tools/token_pricing.md)。
 
@@ -312,6 +358,7 @@ Vismockup's current manual uses `api_md` (underscore), not `api-md` (hyphen). Bo
 - 写 API 代码前先查该产品的 API 文档核对精确签名；`build` 失败的 DLL 绝不能 `run`；会修改 / 保存 / 覆盖数据的 skill 必须先获得用户确认。
 - Agent 不得自行提权；需要管理员权限的步骤只提示用户执行。
 - 详细规则见 [.github/copilot-instructions.md](.github/copilot-instructions.md)。
+- **Claude Desktop：**[tools/mcp](tools/mcp/README.md) 提供本地 stdio MCP 适配器，开放仓库文本/技能工具并调用现有 runner，不改变软件执行方式。依赖安装、JSON 配置生成、审批与验证步骤见该说明。
 
 ### 1.1 软件与 API 授权前提
 
@@ -493,6 +540,7 @@ Agent 通过仓库内的 `Memory/` 积累经验，随仓库共享：
 AGENTS.md  CLAUDE.md             Codex / Claude 客户端的入口文件，指向上一个文件
 tools/envcheck.ps1                环境与软件检测 / 安装（本文件第 2 节）
 tools/memcheck.ps1                Memory 门禁（被所有 runner 调用）
+tools/mcp/                        本地 stdio MCP 服务、PowerShell 适配器与测试（第 8 节）
 tools/tokencost.ps1               Token 与费用估算（规则 G2），详见 tools/token_pricing.md
 tools/hostbuild.ps1  tools/hosts/ 运行宿主的源码（首次使用时用 csc 编译到 %LOCALAPPDATA%\Industry-Digital-Software-AI-Tools\bin；脚本内无 Add-Type，无需签名）
 Memory/                           全部 lessons / 纠错：learned.md + 主题文件 + INDEX.md（本文件第 5 节）
@@ -518,3 +566,47 @@ Teamcenter/                       预留
 | Vismockup / Teamcenter Visualization | `Vismockup/api_md/` |
 
 Vismockup 当前手册使用 `api_md`（下划线），而非 `api-md`（连字符）。Git 同时忽略两种拼写，但应将资料配置到 `api_md`，以匹配现有查阅路径。这些 API 目录仅供本地使用，已由 `.gitignore` 排除；添加规则不会删除本地文件，也不会自动取消 Git 已跟踪的文件。生成 skill 前，应确认对应 API 索引可读取，且文档与已安装软件版本匹配。
+
+<a id="zh-mcp"></a>
+
+## 8. 本地 MCP 服务器（Claude Desktop）
+
+[本地 MCP 服务器](tools/mcp/README.md) 通过 **stdio** 将 Claude Desktop 连接到当前仓库，新增仓库读取、技能源码/文档写入及 runner 任务工具，复用现有 PowerShell runner、COM 自动化、NX 宿主和 Tecnomatix AI Bridge。直接使用 runner 的方式不变；MCP 不安装制造软件，也不授予软件/API 许可。
+
+### 8.1 安装与连接
+
+要求：**Node.js 20+**（建议 LTS）、npm、64 位 Windows PowerShell，以及第 2 节中的原有编译/软件前提条件。将以下占位符替换为绝对路径：
+
+```powershell
+Set-Location '<RepoRoot>\tools\mcp'
+& '<NpmCmdAbsolutePath>' ci --ignore-scripts --no-audit --no-fund
+& '<NodeExeAbsolutePath>' '<RepoRoot>\tools\mcp\server.mjs' --print-config
+```
+
+备份 `%APPDATA%\Claude\claude_desktop_config.json`，再将生成的 `mcpServers` 对象合并到现有 JSON 顶层，保留其它服务和设置；不要整份替换文件或重复创建 `mcpServers` 键。完全退出并重启 Claude Desktop，在 **Settings > Developer** 检查 `industry-digital-software`。
+
+Claude 自动启动 Node；不需要 HTTP 端口、API key、全局 MCP 包、`cwd` 设置或手动另起服务。移动 Node 或仓库后重新生成配置。每次对话开始时明确要求调用 `repository_context`，不能假设 Desktop 会自动发现仓库的 Agent 指令。
+
+### 8.2 工具与执行流程
+
+| Tool | Purpose |
+|---|---|
+| `repository_context` | Read startup rules, README and Memory without running software. |
+| `repository_read` | Read supported repository text files with pagination. |
+| `repository_list` | List repository directories with pagination. |
+| `skill_write` | Write source/Markdown only under a product's `Task/<Skill>`; overwrites require approval. |
+| `runner_start` | Start `environment`, `setup`, `ping` (Tecnomatix only), `build` or `run` jobs. |
+| `runner_status` | Retrieve job status, paginated output and the actual exit code. |
+
+遵循顺序：`repository_context` → 环境检测 → 产品 `setup` → API 参考核对与技能创建 → `build` → 获准后 `run`。为 `runner_start` 提供有意义的 `taskHint`，读完全部 Memory/输出分页，只使用 `USABLE` 产品，并要求 setup/build 退出码为 0。环境检测可能执行原有 Tecnomatix 本地准备，并非纯只读操作。
+
+build/run 要求 `skill` 和 `authorized: true`；所有 run（包括只读技能）还必须获得真实用户批准并设置 `userConfirmed: true`。仅在获准覆盖技能文件后设置 `overwriteConfirmed: true`。**这些标志是调用方声明，不是独立权限检查或人工审批对话框；Desktop 中应保持操作工具审批开启。** NX/COM 参数使用字符串数组 `args`；Tecnomatix 使用 JSON 对象 `argsJson`。
+
+任务 ID 仅表示已启动；成功必须同时满足 **`status: "completed"` 和 `exitCode: 0`**。运行期间轮询 `runner_status`，读取输出直至 `nextOffset` 达到 `outputLength`。同一时间仅允许一个 runner 或技能写入。MCP 服务重启后 setup/build 记录清空；旧 DLL 必须在该次 MCP 会话成功编译后才能运行。默认超时 120 秒（`timeoutSeconds`：10–3600）；超时、输出超过 4 MiB 或 MCP 断开会停止 runner 进程树，重试前检查部分结果。
+
+### 8.3 环境恢复、边界与验证
+
+- **Desktop 过滤环境：**适配器在启动 runner PowerShell 前恢复缺失的 Windows Machine/User 设置和标准目录，合并持久 `PATH` / `PATHEXT` 条目，并保留调用方条目与非空标量覆盖值。恢复仅影响子进程，不修改 Windows 持久设置或现有 runner；不能编造缺失的 NX 路径/许可证，也不会安装工具。修改用户环境变量后完全重启 Claude；显式服务 `env` 覆盖值错误时应修正。
+- **访问边界：**文本访问限制在当前仓库，技能写入限制在产品 `Task/<Skill>` 目录；不开放任意 shell 工具、自动提权或新 DLL 加载器。编译技能**不是沙箱程序**，仍可通过 runner 参数访问外部输入/输出路径，审批必须覆盖具体目标。本地 MCP 不会使 Claude 模型本地化；未经授权不得发送秘密或专有/客户数据。
+- **验证：**在 MCP 目录运行 `& '<NpmCmdAbsolutePath>' test`，测试覆盖协议/工具、路径限制、执行门禁、审批标志、分页、超时、取消、过滤环境恢复和 PowerShell 参数/JSON 传输。可选真实检查及详细排错见 [MCP 指南](tools/mcp/README.md)。
+- **排错：**遇到 `ERR_MODULE_NOT_FOUND`，用 `npm ci` 安装锁定依赖；连接缺失时检查生成的路径/JSON，并完全重启 Desktop。setup 失败须读完 runner 输出，不能绕过。日志位于 `%APPDATA%\Claude\logs`（`mcp.log` 和 `mcp-server-industry-digital-software.log`）。
