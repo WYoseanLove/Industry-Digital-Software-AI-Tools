@@ -2,6 +2,8 @@ bin/
 obj/
 .vs/
 node_modules/
+/Datas/*
+!/Datas/.gitkeep
 /*/Task/*
 !/*/Task/.gitkeep
 /Memory/Costomer/*
